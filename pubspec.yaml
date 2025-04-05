@@ -1,0 +1,62 @@
+name: nfc_01
+description: "A new Flutter project."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_nfc_kit: ^3.5.0
+  ndef: ^0.3.3
+  nfc_manager: ^3.5.0
+  flutter_tts: ^3.5.0
+  audioplayers: ^6.0.0
+  fl_chart: ^0.69.2
+  http: ^1.1.0
+  shared_preferences: ^2.3.4
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  cupertino_icons: ^1.0.8
+  mongo_dart: ^0.10.0
+
+dependency_overrides:
+  js: "^0.6.4"
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    # Image files
+    - assets/images/apple.jpg
+    - assets/images/banana.jpg
+    - assets/images/grape.jpg
+    - assets/images/orange.jpg
+    - assets/images/pear.jpg
+    - assets/images/pineapple.jpg
+    - assets/images/watermelon.jpg
+    
+    # Audio files - English
+    - assets/audio/en/apple.mp3
+    - assets/audio/en/banana.mp3
+    - assets/audio/en/grape.mp3
+    - assets/audio/en/orange.mp3
+    - assets/audio/en/pear.mp3
+    - assets/audio/en/pineapple.mp3
+    - assets/audio/en/watermelon.mp3
+    
+    # Audio files - Vietnamese
+    - assets/audio/vn/apple.mp3
+    - assets/audio/vn/banana.mp3
+    - assets/audio/vn/grape.mp3
+    - assets/audio/vn/orange.mp3
+    - assets/audio/vn/pear.mp3
+    - assets/audio/vn/pineapple.mp3
+    - assets/audio/vn/watermelon.mp3
