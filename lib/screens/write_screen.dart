@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nfc_manager/nfc_manager.dart';
 import '../Models/WordData.dart';
 import '../Models/API.dart';
 import '../widgets/word_display.dart';
@@ -15,6 +16,7 @@ class _WriteScreenState extends State<WriteScreen> {
   final Testapi _api = Testapi();
   bool _mounted = true;
   bool _isLoading = true;
+  bool _isWriting = false;
   WordData? selectedWord;
 
   @override
@@ -46,6 +48,121 @@ class _WriteScreenState extends State<WriteScreen> {
     setState(() {
       selectedWord = word;
     });
+  }
+
+  /// Hiển thị thông báo SnackBar
+  void _showMessage(String message, {bool isError = false}) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  /// Ghi từ vựng vào thẻ NFC
+  Future<void> _writeToNFC() async {
+    if (selectedWord == null) {
+      _showMessage('Vui lòng chọn một từ trước!', isError: true);
+      return;
+    }
+
+    setState(() {
+      _isWriting = true;
+    });
+
+    try {
+      // Kiểm tra NFC có khả dụng không
+      bool isAvailable = await NfcManager.instance.isAvailable();
+      if (!isAvailable) {
+        _showMessage('NFC không khả dụng trên thiết bị này!', isError: true);
+        setState(() {
+          _isWriting = false;
+        });
+        return;
+      }
+
+      // Tạo dữ liệu để ghi
+      // Format: "EN:english|VN:vietnamese|IMG:imagePath"
+      String dataToWrite = 'EN:${selectedWord!.en}|VN:${selectedWord!.vn}|IMG:${selectedWord!.image}';
+
+      _showMessage('Đang chờ thẻ NFC... Vui lòng đưa thẻ lại gần!');
+
+      // Bắt đầu session ghi NFC
+      await NfcManager.instance.startSession(
+        onDiscovered: (NfcTag tag) async {
+          try {
+            var ndef = Ndef.from(tag);
+
+            if (ndef == null) {
+              _showMessage('Thẻ không hỗ trợ NDEF!', isError: true);
+              await NfcManager.instance.stopSession(
+                errorMessage: 'Thẻ không hỗ trợ NDEF',
+              );
+              return;
+            }
+
+            if (!ndef.isWritable) {
+              _showMessage('Thẻ NFC này không thể ghi!', isError: true);
+              await NfcManager.instance.stopSession(
+                errorMessage: 'Thẻ không thể ghi',
+              );
+              return;
+            }
+
+            // Kiểm tra dung lượng thẻ
+            int dataSize = dataToWrite.length;
+            int maxSize = ndef.maxSize;
+            
+            if (dataSize > maxSize) {
+              _showMessage(
+                'Dữ liệu quá lớn! ($dataSize bytes > $maxSize bytes)',
+                isError: true,
+              );
+              await NfcManager.instance.stopSession(
+                errorMessage: 'Dữ liệu quá lớn',
+              );
+              return;
+            }
+
+            // Tạo NDEF message
+            NdefMessage message = NdefMessage([
+              NdefRecord.createText(dataToWrite),
+            ]);
+
+            // Ghi vào thẻ
+            await ndef.write(message);
+
+            _showMessage('✅ Ghi thành công từ "${selectedWord!.en}"!');
+            
+            await NfcManager.instance.stopSession();
+            
+            if (mounted) {
+              setState(() {
+                selectedWord = null; // Reset selection
+              });
+            }
+          } catch (e) {
+            _showMessage('Lỗi khi ghi thẻ: $e', isError: true);
+            await NfcManager.instance.stopSession(
+              errorMessage: 'Lỗi: $e',
+            );
+          }
+        },
+      );
+    } catch (e) {
+      _showMessage('Lỗi: $e', isError: true);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isWriting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -88,9 +205,7 @@ class _WriteScreenState extends State<WriteScreen> {
                   ),
                   WordDisplay(word: selectedWord!),
                   ElevatedButton(
-                    onPressed: () {
-                      // TODO: Implement NFC write
-                    },
+                    onPressed: _isWriting ? null : _writeToNFC,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 156, 107, 75),
                       padding: const EdgeInsets.symmetric(
@@ -98,14 +213,23 @@ class _WriteScreenState extends State<WriteScreen> {
                         vertical: 16,
                       ),
                     ),
-                    child: const Text(
-                      'Ghi vào thẻ NFC',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: _isWriting
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Ghi vào thẻ NFC',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                 ],
                 Expanded(

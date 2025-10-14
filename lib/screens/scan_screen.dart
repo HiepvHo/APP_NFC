@@ -22,12 +22,14 @@ class _ScanScreenState extends State<ScanScreen> {
   String scannedWord = '';
   WordData? matchedWord;
   bool isScanning = false;
+  bool isScanningNFC = false;
   bool isProcessingImage = false;
   dynamic _capturedImage;
   List<WordData> wordList = [];
   final Testapi _api = Testapi();
   bool _mounted = true;
   String _errorMessage = '';
+  String _nfcMessage = '';
 
   @override
   void initState() {
@@ -75,9 +77,160 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
+  /// Quét thẻ NFC để đọc từ vựng
+  Future<void> _scanNFC() async {
+    setState(() {
+      _errorMessage = '';
+      _nfcMessage = '';
+      isScanningNFC = true;
+      matchedWord = null;
+    });
+
+    try {
+      // Kiểm tra NFC có khả dụng không
+      bool isAvailable = await NfcManager.instance.isAvailable();
+      if (!isAvailable) {
+        setState(() {
+          _errorMessage = 'NFC không khả dụng trên thiết bị này!';
+          isScanningNFC = false;
+        });
+        return;
+      }
+
+      setState(() {
+        _nfcMessage = 'Đang chờ thẻ NFC... Vui lòng đưa thẻ lại gần!';
+      });
+
+      // Bắt đầu session đọc NFC
+      await NfcManager.instance.startSession(
+        onDiscovered: (NfcTag tag) async {
+          try {
+            var ndef = Ndef.from(tag);
+
+            if (ndef == null) {
+              setState(() {
+                _errorMessage = 'Thẻ không hỗ trợ NDEF!';
+                _nfcMessage = '';
+              });
+              await NfcManager.instance.stopSession(
+                errorMessage: 'Thẻ không hỗ trợ NDEF',
+              );
+              return;
+            }
+
+            // Đọc dữ liệu từ thẻ
+            NdefMessage ndefMessage = await ndef.read();
+
+            if (ndefMessage.records.isEmpty) {
+              setState(() {
+                _errorMessage = 'Thẻ NFC trống hoặc không có dữ liệu!';
+                _nfcMessage = '';
+              });
+              await NfcManager.instance.stopSession(
+                errorMessage: 'Thẻ trống',
+              );
+              return;
+            }
+
+            // Lấy text từ record đầu tiên
+            String rawData = '';
+            for (var record in ndefMessage.records) {
+              if (record.typeNameFormat == NdefTypeNameFormat.nfcWellknown) {
+                // Payload của text record có format: [language_code_length][language_code][text]
+                // Byte đầu tiên là length của language code
+                var payload = record.payload;
+                if (payload.isNotEmpty) {
+                  int languageCodeLength = payload[0] & 0x3F; // 6 bits thấp
+                  int textStart = 1 + languageCodeLength;
+                  if (textStart < payload.length) {
+                    rawData = String.fromCharCodes(payload.sublist(textStart));
+                  }
+                }
+              }
+            }
+
+            if (rawData.isEmpty) {
+              setState(() {
+                _errorMessage = 'Không đọc được dữ liệu từ thẻ!';
+                _nfcMessage = '';
+              });
+              await NfcManager.instance.stopSession(
+                errorMessage: 'Không có dữ liệu',
+              );
+              return;
+            }
+
+            // Parse dữ liệu: "EN:english|VN:vietnamese|IMG:imagePath"
+            Map<String, String> parsedData = {};
+            var parts = rawData.split('|');
+            for (var part in parts) {
+              var keyValue = part.split(':');
+              if (keyValue.length == 2) {
+                parsedData[keyValue[0]] = keyValue[1];
+              }
+            }
+
+            if (parsedData.isEmpty || !parsedData.containsKey('EN')) {
+              setState(() {
+                _errorMessage = 'Dữ liệu thẻ không đúng định dạng!';
+                _nfcMessage = '';
+              });
+              await NfcManager.instance.stopSession(
+                errorMessage: 'Dữ liệu không hợp lệ',
+              );
+              return;
+            }
+
+            // Tìm từ trong database theo tên tiếng Anh
+            String englishWord = parsedData['EN']!;
+            WordData? foundWord = wordList.firstWhere(
+              (word) => word.en?.toLowerCase() == englishWord.toLowerCase(),
+              orElse: () => WordData(
+                id: 0,
+                en: parsedData['EN'],
+                vn: parsedData['VN'] ?? 'Không có dịch',
+                image: parsedData['IMG'] ?? '',
+                audioEn: '',
+                audioVn: '',
+              ),
+            );
+
+            setState(() {
+              matchedWord = foundWord;
+              scannedWord = foundWord.en ?? '';
+              _nfcMessage = '';
+            });
+
+            await NfcManager.instance.stopSession();
+          } catch (e) {
+            setState(() {
+              _errorMessage = 'Lỗi khi đọc thẻ: $e';
+              _nfcMessage = '';
+            });
+            await NfcManager.instance.stopSession(
+              errorMessage: 'Lỗi: $e',
+            );
+          }
+        },
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Lỗi: $e';
+        _nfcMessage = '';
+      });
+    } finally {
+      if (_mounted) {
+        setState(() {
+          isScanningNFC = false;
+        });
+      }
+    }
+  }
+
   Future<void> _captureImage() async {
     setState(() {
       _errorMessage = '';
+      _nfcMessage = '';
     });
 
     final picker = ImagePicker();
@@ -222,15 +375,63 @@ class _ScanScreenState extends State<ScanScreen> {
                   ),
                 ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: isProcessingImage ? null : _captureImage,
+              // Hiển thị thông báo NFC nếu đang quét
+              if (_nfcMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(
+                        _nfcMessage,
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 16),
+              // Nút quét NFC
+              ElevatedButton.icon(
+                onPressed: isScanningNFC || isProcessingImage ? null : _scanNFC,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 41, 128, 160),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                ),
+                icon: Icon(
+                  isScanningNFC ? Icons.hourglass_empty : Icons.nfc,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  isScanningNFC ? 'Đang quét NFC...' : 'Quét thẻ NFC',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Nút chụp ảnh
+              ElevatedButton.icon(
+                onPressed: isProcessingImage || isScanningNFC ? null : _captureImage,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 156, 107, 75),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 ),
-                child: Text(
-                  isProcessingImage ? 'Đang xử lý...' : 'Chụp ảnh',
+                icon: Icon(
+                  isProcessingImage ? Icons.hourglass_empty : Icons.camera_alt,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  isProcessingImage ? 'Đang xử lý...' : 'Chụp ảnh nhận diện',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

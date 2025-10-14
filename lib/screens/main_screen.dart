@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nfc_01/screens/list_screen.dart';
 import 'package:nfc_01/screens/scan_screen.dart';
 import 'package:nfc_01/screens/write_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nfc_01/screens/profile_screen.dart';
 import 'home_screen.dart';
 import 'word_screen.dart';
 import 'find_screen.dart';
@@ -65,12 +64,13 @@ class _MainScreenState extends State<MainScreen> {
     loadWords();
 
     _screens = [
-      HomeScreen(), // Truyền dữ liệu vào màn hình
-      ListScreen(),
-      ScanScreen(),
-      WordScreen(),
-      FindScreen(),
-      WriteScreen(),
+      HomeScreen(), // Trang chủ
+      ListScreen(), // Danh sách từ vựng
+      ScanScreen(), // Nhận diện
+      WordScreen(), // Chọn từ đúng
+      FindScreen(), // Tìm kiếm
+      WriteScreen(), // Ghi thẻ NFC
+      ProfileScreen(), // Hồ sơ người dùng
     ];
   }
 
@@ -128,6 +128,10 @@ class _MainScreenState extends State<MainScreen> {
             icon:
                 Icon(Icons.edit, color: _getIconColor(4)), // Ghi thông tin thẻ
             label: 'Write',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, color: _getIconColor(5)), // Hồ sơ
+            label: 'Profile',
           ),
         ],
         type: BottomNavigationBarType.fixed,
