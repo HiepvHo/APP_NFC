@@ -95,31 +95,41 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStatItem(String label, String value, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white, size: 20),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-              ),
+    return Flexible(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 18),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 10,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -143,121 +153,143 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFDAC1),
-      body: Column(
-        children: [
-          // Stats overview container
-          Container(
-            height: 200,
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Left side - Pie Chart
-                Expanded(
-                  flex: 3,
-                  child: PieChart(
-                    PieChartData(
-                      sections: userStats.map((stat) {
-                        return PieChartSectionData(
-                          color: stat['color'],
-                          value: stat['value'].toDouble(),
-                          title: '${stat['value']}%',
-                          radius: 60,
-                          titleStyle: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        );
-                      }).toList(),
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 30,
-                    ),
-                  ),
-                ),
-                // Right side - Learning Stats
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 55, 115, 243)
-                          .withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildStatItem(
-                            'Learning Ability', '95%', Icons.trending_up),
-                        _buildStatItem('Best Response', '1.2s', Icons.timer),
-                        _buildStatItem('Daily Streak', '7 days',
-                            Icons.local_fire_department),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Top Users Section
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Stats overview container
+            Container(
+              padding: const EdgeInsets.all(12),
+              child: Row(
                 children: [
-                  const Text(
-                    'Top Learners This Month',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                  // Left side - Pie Chart
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: topUsers.length,
-                      itemBuilder: (context, index) {
-                        final user = topUsers[index];
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.pink.shade200,
-                            child: Text(
-                              '#${user['rank']}',
-                              style: const TextStyle(
-                                color: Colors.white,
+                    flex: 3,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: PieChart(
+                        PieChartData(
+                          sections: userStats.map((stat) {
+                            return PieChartSectionData(
+                              color: stat['color'],
+                              value: stat['value'].toDouble(),
+                              title: '${stat['value']}%',
+                              radius: 50,
+                              titleStyle: const TextStyle(
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
-                            ),
-                          ),
-                          title: Text(
-                            user['name'],
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          trailing: Text(
-                            '${user['score']} points',
-                            style: const TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
+                            );
+                          }).toList(),
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 25,
+                        ),
+                      ),
                     ),
                   ),
-                  _buildVocabularyCard(),
+                  const SizedBox(width: 12),
+                  // Right side - Learning Stats
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 55, 115, 243)
+                            .withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildStatItem(
+                              'Learning Ability', '95%', Icons.trending_up),
+                          const SizedBox(height: 8),
+                          _buildStatItem('Best Response', '1.2s', Icons.timer),
+                          const SizedBox(height: 8),
+                          _buildStatItem('Daily Streak', '7 days',
+                              Icons.local_fire_department),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+            // Top Users Section
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Top Learners This Month',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: topUsers.length + 1, // +1 for vocabulary card
+                        itemBuilder: (context, index) {
+                          // Show vocabulary card at the end
+                          if (index == topUsers.length) {
+                            return _buildVocabularyCard();
+                          }
+                          
+                          final user = topUsers[index];
+                          return ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.pink.shade200,
+                              radius: 20,
+                              child: Text(
+                                '#${user['rank']}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              user['name'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            trailing: Text(
+                              '${user['score']} points',
+                              style: const TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
