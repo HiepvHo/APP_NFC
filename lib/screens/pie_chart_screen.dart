@@ -1,6 +1,18 @@
+// ============================================================================
+// FILE: pie_chart_screen.dart
+// MÔ TẢ: Màn hình hiển thị biểu đồ tròn (demo/example)
+// CHỨC NĂNG:
+//   - Hiển thị PieChart với fl_chart package
+//   - Demo data mẫu cho 3 categories
+//   - Touch interaction (tap vào section)
+//   - Có thể mở rộng để hiển thị thống kê thực tế
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+/// ===== CLASS: PieChartScreen =====
+/// Màn hình demo biểu đồ tròn (StatelessWidget)
 class PieChartScreen extends StatelessWidget {
   const PieChartScreen({super.key});
 

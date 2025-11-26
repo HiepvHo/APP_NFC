@@ -1,8 +1,21 @@
+// ============================================================================
+// FILE: register_screen.dart
+// MÔ TẢ: Màn hình đăng ký tài khoản mới
+// CHỨC NĂNG:
+//   - Đăng ký với username, email, password, fullname (optional)
+//   - Validation đầy đủ (email format, password length, confirm password)
+//   - Kiểm tra username/email unique trong database
+//   - Hash password trước khi lưu (SHA-256)
+//   - Tạo user mới trong MongoDB
+//   - Chuyển về LoginScreen sau khi đăng ký thành công
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:nfc_01/screens/login_screen.dart';
 import '../utils/auth.dart';
 
-/// Màn hình đăng ký
+/// ===== CLASS: RegisterScreen =====
+/// Màn hình đăng ký tài khoản mới
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 

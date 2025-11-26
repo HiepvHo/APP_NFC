@@ -1,7 +1,21 @@
+// ============================================================================
+// FILE: forgot_password_screen.dart
+// MÔ TẢ: Màn hình quên mật khẩu - Bước 1 của flow reset password
+// CHỨC NĂNG:
+//   - Nhập email để nhận mã OTP
+//   - Validate email tồn tại trong database
+//   - Tạo mã OTP 6 chữ số ngẫu nhiên
+//   - Gửi OTP qua email (SMTP)
+//   - Lưu OTP vào DB với expiry time (5 phút)
+//   - Chuyển sang VerifyCodeScreen
+// FLOW: ForgotPassword -> VerifyCode -> ResetPassword -> Login
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:nfc_01/screens/verify_code_screen.dart';
 import '../utils/auth.dart';
 
+/// ===== CLASS: ForgotPasswordScreen =====
 /// Màn hình quên mật khẩu - Nhập email để nhận mã xác thực
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

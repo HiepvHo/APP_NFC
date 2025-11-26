@@ -1,3 +1,13 @@
+// ============================================================================
+// FILE: main_screen.dart
+// MÔ TẢ: Màn hình chính với Bottom Navigation Bar
+// CHỨC NĂNG:
+//   - Quản lý navigation giữa 4 màn hình chính: Home, Scan, List, Profile
+//   - Hiển thị Bottom Navigation Bar
+//   - Giữ state của từng tab khi chuyển đổi
+//   - Custom AppBar cho từng màn hình
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:nfc_01/screens/list_screen.dart';
 import 'package:nfc_01/screens/scan_screen.dart';
@@ -9,6 +19,8 @@ import 'find_screen.dart';
 import '../Models/WordData.dart';
 import 'package:nfc_01/Models/API.dart';
 
+// ===== DANH SÁCH TỪ VỰNG MẪU =====
+// Dữ liệu backup khi không kết nối được MongoDB
 List<WordData> wordListReal = [
   WordData(
     id: 1,

@@ -1,8 +1,21 @@
+// ============================================================================
+// FILE: find_screen.dart
+// MÔ TẢ: Màn hình tìm kiếm từ vựng nâng cao
+// CHỨC NĂNG:
+//   - Search bar để tìm từ (theo EN hoặc VN)
+//   - Realtime filter khi gõ
+//   - Hiển thị kết quả search dạng list
+//   - Tap vào item để xem chi tiết (WordDisplay)
+//   - Clear search để reset
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import '../Models/WordData.dart';
 import '../Models/API.dart';
 import '../widgets/word_display.dart';
 
+/// ===== CLASS: FindScreen =====
+/// Tìm kiếm từ vựng với search bar
 class FindScreen extends StatefulWidget {
   const FindScreen({super.key});
 
@@ -11,8 +24,8 @@ class FindScreen extends StatefulWidget {
 }
 
 class _FindScreenState extends State<FindScreen> {
-  List<WordData> wordList = [];
-  List<WordData> filteredWords = [];
+  List<WordData> wordList = [];        // Toàn bộ từ vựng
+  List<WordData> filteredWords = [];   // Kết quả sau khi filter
   final Testapi _api = Testapi();
   bool _mounted = true;
   bool _isLoading = true;

@@ -1,5 +1,4 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import '../Models/WordData.dart';
 
 Future<void> seedDatabase() async {
   final db = await Db.create(

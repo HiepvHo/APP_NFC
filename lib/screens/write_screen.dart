@@ -1,9 +1,23 @@
+// ============================================================================
+// FILE: write_screen.dart
+// MÔ TẢ: Màn hình ghi dữ liệu vào thẻ NFC
+// CHỨC NĂNG:
+//   - Hiển thị danh sách từ vựng có thể chọn
+//   - Chọn từ vựng muốn ghi
+//   - Ghi thông tin vào thẻ NFC theo format NDEF
+//   - Hiển thị trạng thái ghi (đang ghi, thành công, thất bại)
+//   - Xác nhận ghi thành công với dialog
+// FORMAT GHI: "EN:english|VN:vietnamese|IMG:imagePath"
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import '../Models/WordData.dart';
 import '../Models/API.dart';
 import '../widgets/word_display.dart';
 
+/// ===== CLASS: WriteScreen =====
+/// Màn hình ghi từ vựng vào thẻ NFC
 class WriteScreen extends StatefulWidget {
   const WriteScreen({super.key});
 
@@ -12,7 +26,7 @@ class WriteScreen extends StatefulWidget {
 }
 
 class _WriteScreenState extends State<WriteScreen> {
-  List<WordData> wordList = [];
+  List<WordData> wordList = [];  // Danh sách từ có thể ghi
   final Testapi _api = Testapi();
   bool _mounted = true;
   bool _isLoading = true;

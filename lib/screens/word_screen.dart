@@ -1,9 +1,22 @@
+// ============================================================================
+// FILE: word_screen.dart
+// MÔ TẢ: Màn hình hiển thị chi tiết một từ vựng ngẫu nhiên
+// CHỨC NĂNG:
+//   - Chọn ngẫu nhiên 1 từ vựng từ MongoDB
+//   - Hiển thị hình ảnh, text EN/VN
+//   - Phát audio (tiếng Anh và tiếng Việt)
+//   - Button "Next" để xem từ ngẫu nhiên khác
+//   - Sử dụng WordDisplay widget để hiển thị
+// ============================================================================
+
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../Models/WordData.dart';
 import '../Models/API.dart';
 import '../widgets/word_display.dart';
 
+/// ===== CLASS: WordScreen =====
+/// Hiển thị từ vựng ngẫu nhiên với audio
 class WordScreen extends StatefulWidget {
   const WordScreen({super.key});
 
@@ -12,7 +25,7 @@ class WordScreen extends StatefulWidget {
 }
 
 class _WordScreenState extends State<WordScreen> {
-  WordData? currentWord;
+  WordData? currentWord;  // Từ vựng hiện tại đang hiển thị
   List<WordData> wordList = [];
   final Testapi _api = Testapi();
   bool _mounted = true;

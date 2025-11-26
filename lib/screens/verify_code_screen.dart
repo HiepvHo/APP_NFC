@@ -1,11 +1,25 @@
+// ============================================================================
+// FILE: verify_code_screen.dart
+// MÔ TẢ: Màn hình xác thực OTP - Bước 2 của flow reset password
+// CHỨC NĂNG:
+//   - Nhập mã OTP 6 chữ số (nhận qua email)
+//   - Xác thực OTP với database
+//   - Countdown timer (5 phút) - hết hạn thì OTP không còn hợp lệ
+//   - Resend OTP nếu chưa nhận được
+//   - Chuyển sang ResetPasswordScreen khi verify thành công
+// PROPS: email (String) - Email của user đang reset password
+// FLOW: ForgotPassword -> VerifyCode -> ResetPassword -> Login
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nfc_01/screens/reset_password_screen.dart';
 import '../utils/auth.dart';
 
+/// ===== CLASS: VerifyCodeScreen =====
 /// Màn hình xác thực OTP - Nhập mã 6 chữ số
 class VerifyCodeScreen extends StatefulWidget {
-  final String email;
+  final String email;  // Email user đang reset password
 
   const VerifyCodeScreen({super.key, required this.email});
 

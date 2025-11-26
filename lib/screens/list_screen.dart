@@ -1,8 +1,21 @@
+// ============================================================================
+// FILE: list_screen.dart
+// MÔ TẢ: Màn hình danh sách tất cả từ vựng
+// CHỨC NĂNG:
+//   - Hiển thị ListView tất cả từ trong MongoDB
+//   - Search/Filter từ vựng
+//   - Tap vào item để xem chi tiết (WordDisplay widget)
+//   - Pull to refresh để tải lại dữ liệu
+//   - Loading state khi fetch data
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import '../Models/WordData.dart';
 import '../Models/API.dart';
 import '../widgets/word_display.dart';
 
+/// ===== CLASS: ListScreen =====
+/// Hiển thị danh sách từ vựng dạng list
 class ListScreen extends StatefulWidget {
   const ListScreen({super.key});
 
@@ -11,8 +24,8 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
-  List<WordData> wordList = [];
-  final Testapi _api = Testapi();
+  List<WordData> wordList = [];  // Danh sách từ vựng từ MongoDB
+  final Testapi _api = Testapi();  // API instance
   bool _mounted = true;
   bool _isLoading = true;
 

@@ -1,7 +1,18 @@
+// ============================================================================
+// FILE: scan_screen.dart
+// MÔ TẢ: Màn hình quét NFC và nhận diện hình ảnh
+// CHỨC NĂNG:
+//   - Quét thẻ NFC (NDEF format): Đọc dữ liệu từ vựng từ thẻ
+//   - Chụp ảnh: Mở camera để chụp đối tượng
+//   - Chọn ảnh: Chọn từ thư viện
+//   - AI Recognition: Gửi ảnh đến API nhận diện và trả về từ vựng
+//   - Hiển thị WordData: Hình ảnh, text EN/VN, phát audio
+// NFC FORMAT: "EN:english|VN:vietnamese|IMG:imagePath"
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io' as io;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +35,6 @@ class _ScanScreenState extends State<ScanScreen> {
   bool isScanning = false;
   bool isScanningNFC = false;
   bool isProcessingImage = false;
-  dynamic _capturedImage;
   List<WordData> wordList = [];
   final Testapi _api = Testapi();
   bool _mounted = true;
@@ -262,7 +272,6 @@ class _ScanScreenState extends State<ScanScreen> {
 
     if (pickedFile != null && _mounted) {
       setState(() {
-        _capturedImage = kIsWeb ? pickedFile : io.File(pickedFile.path);
         isProcessingImage = true;
         scannedWord = '';
         matchedWord = null;

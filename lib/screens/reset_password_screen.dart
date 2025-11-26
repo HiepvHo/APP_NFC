@@ -1,11 +1,26 @@
+// ============================================================================
+// FILE: reset_password_screen.dart
+// MÔ TẢ: Màn hình đặt lại mật khẩu mới - Bước 3 của flow reset password
+// CHỨC NĂNG:
+//   - Nhập password mới (2 lần để confirm)
+//   - Validate password (>= 6 ký tự, khớp nhau)
+//   - Hash password mới (SHA-256)
+//   - Cập nhật password trong MongoDB
+//   - Xóa OTP code khỏi database
+//   - Chuyển về LoginScreen để đăng nhập lại
+// PROPS: email (String), otp (String) - Để verify quyền reset
+// FLOW: ForgotPassword -> VerifyCode -> ResetPassword -> Login
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:nfc_01/screens/login_screen.dart';
 import '../utils/auth.dart';
 
+/// ===== CLASS: ResetPasswordScreen =====
 /// Màn hình đặt lại mật khẩu mới
 class ResetPasswordScreen extends StatefulWidget {
-  final String email;
-  final String otp;
+  final String email;  // Email của user
+  final String otp;    // OTP đã verify (để check quyền)
 
   const ResetPasswordScreen({
     super.key,

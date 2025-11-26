@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
 class NfcService {
@@ -15,10 +14,12 @@ class NfcService {
 
       try {
         var ndefMessage = await ndef.read();
-        result = ndefMessage?.records
+        result = ndefMessage.records
                 .map((e) => String.fromCharCodes(e.payload))
-                .join("\n") ??
-            "Không có dữ liệu";
+                .join("\n");
+        if (result.isEmpty) {
+          result = "Không có dữ liệu";
+        }
         await NfcManager.instance.stopSession();
       } catch (e) {
         result = 'Lỗi khi đọc thẻ: $e';

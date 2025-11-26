@@ -1,8 +1,19 @@
+// ============================================================================
+// FILE: profile_screen.dart
+// MÔ TẢ: Màn hình hồ sơ người dùng
+// CHỨC NĂNG:
+//   - Hiển thị thông tin user (Avatar, Username, Email, Full Name)
+//   - Thống kê học tập cá nhân (Words, Quizzes, Practice time)
+//   - Settings menu (Đổi mật khẩu, Ngôn ngữ, Thông báo)
+//   - Đăng xuất (Clear token và về LoginScreen)
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:nfc_01/utils/auth.dart';
 import 'package:nfc_01/screens/login_screen.dart';
 import '../Models/User.dart';
 
+/// ===== CLASS: ProfileScreen =====
 /// Màn hình hiển thị thông tin người dùng và các tùy chọn
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
